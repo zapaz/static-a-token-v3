@@ -15,15 +15,15 @@ methods
     // static aToken
 	// -------------
         asset() returns (address) envfree
-        totalAssets() returns (uint256) envfree
-        maxWithdraw(address owner) returns (uint256) envfree
+        totalAssets() returns (uint256)
+        maxWithdraw(address owner) returns (uint256)
         maxRedeem(address owner) returns (uint256) envfree
         previewWithdraw(uint256) returns (uint256)
         previewRedeem(uint256) returns (uint256)
         maxDeposit(address) returns (uint256) envfree
         previewMint(uint256) returns (uint256)
         maxMint(address) returns (uint256) envfree
-        rate() returns (uint256) envfree
+        rate() returns (uint256)
         getUnclaimedRewards(address, address) returns (uint256) envfree
         rewardTokens() returns (address[]) envfree
         isRegisteredRewardToken(address) returns (bool) envfree
@@ -72,8 +72,8 @@ methods
 
     // aToken
 	// ------
-        _AToken.balanceOf(address) returns (uint256) envfree
-        _AToken.totalSupply() returns (uint256) envfree
+        _AToken.balanceOf(address) returns (uint256)
+        _AToken.totalSupply() returns (uint256)
         _AToken.allowance(address, address) returns (uint256) envfree
         _AToken.UNDERLYING_ASSET_ADDRESS() returns (address) envfree
         _AToken.scaledBalanceOf(address) returns (uint256) envfree
