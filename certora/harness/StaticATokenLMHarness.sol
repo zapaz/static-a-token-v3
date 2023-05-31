@@ -3,6 +3,7 @@ pragma solidity ^0.8.10;
 
 import {StaticATokenLM, StaticATokenErrors,  IPool, IRewardsController, IERC20} from '../../src/StaticATokenLM.sol';
 import {SymbolicLendingPool} from './pool/SymbolicLendingPool.sol';
+import {DataTypes, ReserveConfiguration} from '../../lib/aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
 
 
 
@@ -86,4 +87,9 @@ contract StaticATokenLMHarness is StaticATokenLM{
 
     }
 
+    function getReserveData_AToken() public view returns (address) {
+        address cachedATokenUnderlying = _aTokenUnderlying;
+        // DataTypes.ReserveData memory reserveData = POOL.getReserveData(cachedATokenUnderlying);
+        return POOL.getReserveData(cachedATokenUnderlying).aTokenAddress;
+    }
 }

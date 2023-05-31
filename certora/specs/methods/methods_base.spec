@@ -34,6 +34,7 @@ methods
         getRewardsIndexOnLastInteraction(address, address) returns (uint128) envfree
         getRewardTokensLength() returns (uint256) envfree 
         getRewardToken(uint256) returns (address) envfree
+        getReserveData_AToken() returns (address) envfree
 
     // erc20
     // -----
@@ -42,6 +43,7 @@ methods
     // pool
     // ----
         _SymbolicLendingPool.getReserveNormalizedIncome(address) returns (uint256)
+        getReserveData(address) returns ((uint256),uint128,uint128,uint128,uint128,uint128,uint40,uint16,address,address,address,address,uint128,uint128,uint128) envfree => CONSTANT
 	
     // rewards controller
 	// ------------------
@@ -91,6 +93,13 @@ methods
         _DummyERC20_rewardToken.totalSupply() returns (uint256) envfree
 
         UNDERLYING_ASSET_ADDRESS() returns (address) envfree => CONSTANT UNRESOLVED
+
+    // ReserveConfiguration
+        getActive((uint256)) returns (bool) => CONSTANT
+        getPaused((uint256)) returns (bool) => CONSTANT
+        getFrozen((uint256)) returns (bool) => CONSTANT
+        getDecimals((uint256)) returns (bool) => CONSTANT
+        getSupplyCap((uint256)) returns (bool) => CONSTANT
  }
 
 ///////////////// DEFINITIONS //////////////////////
@@ -157,4 +166,5 @@ methods
         require _SymbolicLendingPool != user;
         require _TransferStrategy != user;
         require _TransferStrategy != user;
+        require getReserveData_AToken() == _AToken;
     }
