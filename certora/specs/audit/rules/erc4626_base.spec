@@ -1,5 +1,3 @@
-import "../methods/methods_base.spec"
-
 // The following spec implements erc4626 properties according to the official eip described here:
 // https://eips.ethereum.org/EIPS/eip-4626
 
@@ -15,7 +13,7 @@ import "../methods/methods_base.spec"
             env e1;
             env e2;
             env e3;
-        
+
             address user;
             uint256 assets;
             uint256 shares;
@@ -38,7 +36,7 @@ import "../methods/methods_base.spec"
             env e1;
             env e2;
             env e3;
-        
+
             address user;
             uint256 assets;
             uint256 shares;
@@ -69,7 +67,7 @@ import "../methods/methods_base.spec"
             assert convertToAssets(e, shares) <= amount, "Too many converted shares";
 
             /* The next assertion shows that the rounding in `convertToAssets` is tight. This
-            * protects the user. For example, a function `convertToAssets` that always returns 
+            * protects the user. For example, a function `convertToAssets` that always returns
             * zero would have passed the previous assertion, but not the next one.
             */
             assert convertToAssets(e, shares + 1) >= amount, "Too few converted shares";
@@ -78,7 +76,7 @@ import "../methods/methods_base.spec"
     /*****************************
     *      convertToShares      *
     *****************************/
-        
+
 		/// @title Converting shares to amount is properly rounded down
         rule sharesConversionRoundedDown(uint256 shares) {
 			env e;

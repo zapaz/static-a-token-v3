@@ -1,0 +1,21 @@
+import "testsInit.spec"
+
+use rule metaDepositFailsWithUnderlyingWithNoPermitRule
+
+use rule conversionOfZero
+use rule convertToAssetsWeakAdditivity
+use rule convertToSharesWeakAdditivity
+use rule conversionWeakMonotonicity
+use rule conversionWeakIntegrity
+use rule convertToCorrectness
+use rule zeroDepositZeroShares
+use rule totalAssetsOkRule
+
+use rule getClaimableRewardsBefore_leq_claimed_claimRewardsOnBehalf
+
+// erc4626_base.spec
+use rule previewWithdrawIndependentOfMaxWithdraw1
+use rule previewWithdrawIndependentOfMaxWithdraw2
+use rule amountConversionRoundedDown
+use rule sharesConversionRoundedDown
+use rule maxRedeemMustntRevert

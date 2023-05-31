@@ -1,16 +1,8 @@
-# build and cache
-cache/
-out/
-
-# general
-.env
-
-# editors
-.idea
-.vscode
-
-# well, looks strange to ignore package-lock, but we have only pretter and it's temproray
-package-lock.json
+.env*
 node_modules
-
+cache
+out
 broadcast
+.certora*
+*.zip
+.zip*
