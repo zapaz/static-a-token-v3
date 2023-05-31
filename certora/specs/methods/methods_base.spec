@@ -28,6 +28,9 @@ methods
         rewardTokens() returns (address[]) envfree
         isRegisteredRewardToken(address) returns (bool) envfree
         
+        metaDeposit(address,address,uint256,uint16,bool,uint256,(address,address,uint256,uint256,uint8,bytes32,bytes32),(uint8,bytes32,bytes32)) returns uint256
+
+
     // static aToken harness
     // ---------------------
         getStaticATokenUnderlying() returns (address) envfree

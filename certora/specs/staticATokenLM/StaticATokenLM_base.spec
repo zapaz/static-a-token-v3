@@ -21,13 +21,16 @@ import "../methods/methods_base.spec"
     } 
 
     /// @title Sum of balances of StaticAToken 
-    ghost sumAllBalance() returns mathint {
+    ghost sumAllBalance() returns uint256 {
         init_state axiom sumAllBalance() == 0;
     }
 
     hook Sstore balanceOf[KEY address a] uint256 balance (uint256 old_balance) STORAGE {
-    havoc sumAllBalance assuming sumAllBalance@new() == sumAllBalance@old() + balance - old_balance;
+        havoc sumAllBalance assuming sumAllBalance@new() == sumAllBalance@old() + balance - old_balance;
     }
+
+    invariant totalSupplyEqualSumAllBalances()
+        totalSupply() == sumAllBalance()
 
 ///////////////// Properties ///////////////////////
         

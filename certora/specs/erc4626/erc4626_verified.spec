@@ -4,3 +4,9 @@ import "erc4626_base.spec"
 // https://eips.ethereum.org/EIPS/eip-4626
 
 ///////////////// Properties ///////////////////////
+
+use rule previewWithdrawIndependentOfMaxWithdraw1
+use rule previewWithdrawIndependentOfMaxWithdraw2
+use rule amountConversionRoundedDown
+use rule sharesConversionRoundedDown
+use rule maxRedeemMustntRevert

@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - certora
+  push:
+    branches:
+      - certora-contest2
 
   workflow_dispatch:
 
