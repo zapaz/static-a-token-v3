@@ -1,14 +1,14 @@
 methods {
     // ERC20
-    name                                ()                              returns string      envfree
-    symbol                              ()                              returns string      envfree
-    decimals                            ()                              returns uint8       envfree
-    totalSupply                         ()                              returns uint256     envfree
+    _StaticATokenLM.name                ()                              returns string      envfree
+    _StaticATokenLM.symbol              ()                              returns string      envfree
+    _StaticATokenLM.decimals            ()                              returns uint8       envfree
     _StaticATokenLM.balanceOf           (address)                       returns uint256     envfree
-    allowance                           (address,address)               returns uint256     envfree
-    approve                             (address,uint256)               returns bool
-    transfer                            (address,uint256)               returns bool
-    transferFrom                        (address,address,uint256)       returns bool
+    _StaticATokenLM.totalSupply         ()                              returns uint256     envfree
+    _StaticATokenLM.allowance           (address,address)               returns uint256     envfree
+    _StaticATokenLM.approve             (address,uint256)               returns bool
+    _StaticATokenLM.transfer            (address,uint256)               returns bool
+    _StaticATokenLM.transferFrom        (address,address,uint256)       returns bool
 
     // ASSETS / SHARES
     asset                               ()                              returns address     envfree

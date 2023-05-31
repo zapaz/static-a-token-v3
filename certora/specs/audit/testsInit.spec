@@ -1,6 +1,7 @@
 import "common/definitions.spec"
 import "common/functions.spec"
 
+import "methods/erc20.spec"
 import "methods/methods_base.spec"
 
 import "methods/staticATokenLM.spec"
