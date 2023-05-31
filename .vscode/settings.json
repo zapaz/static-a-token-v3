@@ -1,37 +1,41 @@
 {
-    "favorites.resources": [
-        {
-            "filePath": "certora/specs/test.spec",
-            "group": "Default"
-        },
-        {
-            "filePath": "certora/specs/audit",
-            "group": "Default"
-        },
-        {
-            "filePath": "src",
-            "group": "Default"
-        },
-        {
-            "filePath": "lib/aave-v3-core/contracts/protocol",
-            "group": "Default"
-        },
-        {
-            "filePath": "certora/harness",
-            "group": "Default"
-        },
-        {
-            "filePath": "certora/specs",
-            "group": "Default"
-        },
-        {
-            "filePath": "certora/specs/audit/test.spec",
-            "group": "Default"
-        },
-        {
-            "filePath": "certora/conf/test.conf",
-            "group": "Default"
-        }
-    ],
-    "solidity.compileUsingRemoteVersion": "v0.8.10+commit.fc410830"
+  "favorites.resources": [
+    {
+      "filePath": "certora/specs/test.spec",
+      "group": "Default"
+    },
+    {
+      "filePath": "certora/specs/audit",
+      "group": "Default"
+    },
+    {
+      "filePath": "src",
+      "group": "Default"
+    },
+    {
+      "filePath": "lib/aave-v3-core/contracts/protocol",
+      "group": "Default"
+    },
+    {
+      "filePath": "certora/harness",
+      "group": "Default"
+    },
+    {
+      "filePath": "certora/specs",
+      "group": "Default"
+    },
+    {
+      "filePath": "certora/specs/audit/test.spec",
+      "group": "Default"
+    },
+    {
+      "filePath": "certora/conf/test.conf",
+      "group": "Default"
+    },
+    {
+      "filePath": "certora/specs/audit/verified.spec",
+      "group": "Default"
+    }
+  ],
+  "solidity.compileUsingRemoteVersion": "v0.8.10+commit.fc410830"
 }

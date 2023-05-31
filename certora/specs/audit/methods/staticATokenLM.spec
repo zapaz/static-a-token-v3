@@ -52,6 +52,7 @@ methods {
     getUnclaimedRewards                 (address, address)              returns uint256     envfree
     getCurrentRewardsIndex              (address)                       returns uint256     envfree
     isRegisteredRewardToken             (address)                       returns bool        envfree
+
     getClaimableRewards                 (address, address)              returns uint256
     collectAndUpdateRewards             (address)                       returns uint256
     refreshRewardTokens                 ()

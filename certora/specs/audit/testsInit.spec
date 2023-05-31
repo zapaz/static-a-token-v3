@@ -11,6 +11,7 @@ import "methods/transferStrategy.spec"
 import "methods/rewardsController.spec"
 import "methods/rewardToken.spec"
 
+import "rules/claimRewards.spec"
 import "rules/staticATokenLM_base.spec"
 import "rules/erc4626_base.spec"
 import "rules/erc4626.spec"
@@ -32,4 +33,3 @@ using DummyERC20_aTokenUnderlying as _DummyERC20_aTokenUnderlying
 using PermitERC20_aTokenUnderlying as _PermitERC20_aTokenUnderlying
 
 use invariant totalSupplyIsSumOfBalances
-
