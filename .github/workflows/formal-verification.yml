@@ -6,7 +6,7 @@ on:
       - certora
   push:
     branches:
-      - certora-contest2
+      - certora-contest
 
   workflow_dispatch:
 

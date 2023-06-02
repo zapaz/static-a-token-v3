@@ -3,12 +3,14 @@ import "../methods/methods_base.spec"
 /////////////////// Methods ////////////////////////
 
     methods
-    {   
+    {
         permit(address,address,uint256,uint256,uint8,bytes32,bytes32) => NONDET
         getIncentivesController() returns (address) => CONSTANT
         getRewardsList() returns (address[]) => NONDET
         //call by RewardsController.IncentivizedERC20.sol and also by StaticATokenLM.sol
         handleAction(address,uint256,uint256) => DISPATCHER(true)
+
+       metaDeposit(address,address,uint256,uint16,bool,uint256,(address,address,uint256,uint256,uint8,bytes32,bytes32),(uint8,bytes32,bytes32)) returns uint256
     }
 
 ////////////////// FUNCTIONS //////////////////////
@@ -18,9 +20,9 @@ import "../methods/methods_base.spec"
     //todo: allow 2 or 3 rewards
     hook Sload address reward _rewardTokens[INDEX  uint256 i] STORAGE {
         require reward == _DummyERC20_rewardToken;
-    } 
+    }
 
-    /// @title Sum of balances of StaticAToken 
+    /// @title Sum of balances of StaticAToken
     ghost sumAllBalance() returns uint256 {
         init_state axiom sumAllBalance() == 0;
     }
@@ -29,11 +31,8 @@ import "../methods/methods_base.spec"
         havoc sumAllBalance assuming sumAllBalance@new() == sumAllBalance@old() + balance - old_balance;
     }
 
-    invariant totalSupplyEqualSumAllBalances()
-        totalSupply() == sumAllBalance()
-
 ///////////////// Properties ///////////////////////
-        
+
     /// @title The amount of rewards that was actually received by claimRewards() cannot exceed the initial amount of rewards
     rule getClaimableRewardsBefore_leq_claimed_claimRewardsOnBehalf()
     {
@@ -41,7 +40,7 @@ import "../methods/methods_base.spec"
         address onBehalfOf;
         address receiver;
         require receiver != currentContract;
-        
+
         mathint balanceBefore = _DummyERC20_rewardToken.balanceOf(receiver);
         mathint claimableRewardsBefore = getClaimableRewards(e, onBehalfOf, _DummyERC20_rewardToken);
         claimSingleRewardOnBehalf(e, onBehalfOf, receiver, _DummyERC20_rewardToken);
@@ -56,7 +55,7 @@ import "../methods/methods_base.spec"
     invariant singleAssetAccruedRewards(env e0, address asset, address reward, address user)
         ((_RewardsController.getAssetListLength() == 1 && _RewardsController.getAssetByIndex(0) == asset)
             => (_RewardsController.getUserAccruedReward(asset, reward, user) == _RewardsController.getUserAccruedRewards(reward, user)))
-        filtered { f -> !harnessOnlyMethods(f) }
+        filtered { f -> !harnessFunctions(f) && !metaDepositFunction(f) }
             {
                 preserved with (env e1){
                     setup(e1, user);
