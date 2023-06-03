@@ -58,7 +58,7 @@ import "../methods/methods_base.spec"
         filtered { f -> !untestedFunctions(f) }
             {
                 preserved with (env e1){
-                    setup(e1, user);
+                    setupUser(e1, user);
                     require asset != _RewardsController;
                     require asset != _TransferStrategy;
                     require reward != _StaticATokenLM;

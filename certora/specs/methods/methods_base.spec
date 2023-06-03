@@ -107,8 +107,8 @@ methods
     definition RAY() returns uint256 = 10^27;
 
     definition claimFunctions(method f) returns bool =
-        (   f.selector == claimRewardsToSelf(address[]).selector
-        ||  f.selector == claimRewards(address, address[]).selector
+        (   f.selector == claimRewards(address, address[]).selector
+        ||  f.selector == claimRewardsToSelf(address[]).selector
         ||  f.selector == claimRewardsOnBehalf(address, address,address[]).selector );
 
     definition metaDepositFunction(method f) returns bool =
@@ -116,7 +116,8 @@ methods
 
     definition depositFunctions(method f) returns bool =
         (   f.selector == deposit(uint256,address).selector
-        ||  f.selector == deposit(uint256,address,uint16,bool).selector );
+        ||  f.selector == deposit(uint256,address,uint16,bool).selector
+        ||  f.selector == mint(uint256,address).selector );
 
     definition withdrawFunctions(method f) returns bool =
         (   f.selector == redeem(uint256,address,address).selector
@@ -129,8 +130,7 @@ methods
         ||  f.selector == transferFrom(address,address,uint256).selector );
 
     definition assetsFunctions(method f) returns bool =
-        (   f.selector == mint(uint256,address).selector
-        ||  depositFunctions(f) || claimFunctions(f) || withdrawFunctions(f) );
+        (   depositFunctions(f) || claimFunctions(f) || withdrawFunctions(f) );
 
     definition collectAndUpdateFunction(method f) returns bool =
         f.selector == collectAndUpdateRewards(address).selector;
@@ -177,14 +177,10 @@ methods
 
     /// @title Assumptions that should hold in any run
     /// @dev Assume that RewardsController.configureAssets(RewardsDataTypes.RewardsConfigInput[] memory rewardsInput) was called
-    function setup(env e, address user)
+    function setupUser(env e, address user)
     {
-        require getRewardTokensLength() > 0;
-        require _RewardsController.getAvailableRewardsCount(_AToken)  > 0;
-        require _RewardsController.getRewardsByAsset(_AToken, 0) == _DummyERC20_rewardToken;
-        require currentContract != e.msg.sender;
+        setup(e);
         require currentContract != user;
-
         require _AToken != user;
         require _RewardsController !=  user;
         require _DummyERC20_aTokenUnderlying  != user;
@@ -192,5 +188,11 @@ methods
         require _SymbolicLendingPool != user;
         require _TransferStrategy != user;
         require _TransferStrategy != user;
+    }
+    function setup(env e)
+    {
+        rewardsController_reward_setup();
+        require getRewardTokensLength() > 0;
         require getReserveData_AToken() == _AToken;
+        require currentContract != e.msg.sender;
     }
