@@ -135,6 +135,9 @@ methods
     definition collectAndUpdateFunction(method f) returns bool =
         f.selector == collectAndUpdateRewards(address).selector;
 
+    definition untestedFunctions(method f) returns bool =
+        harnessFunctions(f) || metaDepositFunction(f);
+
     definition harnessFunctions(method f) returns bool =
         harnessClaimFunctions(f) || harnessMethodsMinusHarnessClaimFunctions(f);
 

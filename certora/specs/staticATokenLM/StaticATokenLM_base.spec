@@ -55,7 +55,7 @@ import "../methods/methods_base.spec"
     invariant singleAssetAccruedRewards(env e0, address asset, address reward, address user)
         ((_RewardsController.getAssetListLength() == 1 && _RewardsController.getAssetByIndex(0) == asset)
             => (_RewardsController.getUserAccruedReward(asset, reward, user) == _RewardsController.getUserAccruedRewards(reward, user)))
-        filtered { f -> !harnessFunctions(f) && !metaDepositFunction(f) }
+        filtered { f -> !untestedFunctions(f) }
             {
                 preserved with (env e1){
                     setup(e1, user);

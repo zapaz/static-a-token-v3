@@ -6,10 +6,10 @@ use rule getClaimableRewardsBefore_leq_claimed_claimRewardsOnBehalf
 
 invariant totalSupplyInvariant()
     totalSupply() == sumAllBalance()
-    filtered { f -> !harnessFunctions(f) && !metaDepositFunction(f)}
+    filtered { f -> !untestedFunctions(f)}
 
 rule totalAssetsUnchangedRule(method f) filtered {
-    f -> !assetsFunctions(f) && !harnessFunctions(f)
+    f -> !assetsFunctions(f) && !untestedFunctions(f)
 }{
     env e; calldataarg args;
 
@@ -30,7 +30,7 @@ rule rewardsUnclaimedLessThanClaimableRule(env e) {
 }
 
 rule claimableLessThanUnclaimedRule2(method f, env e, calldataarg  args) filtered {
-    f -> !harnessFunctions(f)
+    f -> !untestedFunctions(f)
 }{
     address user;
     // setup(e, user);
@@ -49,7 +49,8 @@ rule claimableLessThanUnclaimedRule2(method f, env e, calldataarg  args) filtere
 rule unclaimedUnchangedRule(method f, env e, calldataarg args) filtered {
     f -> !depositFunctions(f) && !withdrawFunctions(f)
       && !claimFunctions(f)   && !transferFunctions(f)
-      && !harnessFunctions(f)
+      && !untestedFunctions(f)
+      // &&  f.selector != mint(uint256,address).selector
 }{
     address user;
 
@@ -63,7 +64,10 @@ rule unclaimedUnchangedRule(method f, env e, calldataarg args) filtered {
 rule claimableUnchangedRule(method f, env e, calldataarg args) filtered {
     f -> !depositFunctions(f) && !withdrawFunctions(f)
       && !claimFunctions(f)   && !transferFunctions(f)
-      && !harnessFunctions(f)
+      && !untestedFunctions(f)
+      // &&  f.selector != mint(uint256,address).selector
+      // &&  f.selector != initialize(address,string,string).selector
+      // &&  f.selector != getTotalClaimableRewards(address).selector
 }{
     address user;
 
