@@ -8,7 +8,7 @@ import "staticATokenLM/StaticATokenLM_base.spec"
 // UNREACHABLE  for metaDeposit
 // TIMOUT       for claimRerwardsOnBehalf
 
-rule mintRule_01(method f, env e, calldataarg args) filtered {
+rule mintRule_12(method f, env e, calldataarg args) filtered {
     f -> !untestedFunctions(f)
 }{
     mathint _aTokenBalanceContract = _AToken.balanceOf(e, currentContract);

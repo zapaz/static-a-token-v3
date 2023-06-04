@@ -77,3 +77,60 @@ rule conversionWeakMonotonicity(env e) {
     assert smallerAssets < largerAssets => convertToShares(e, smallerAssets) <= convertToShares(e, largerAssets),
         "converting more assets must yield equal or greater shares";
 }
+
+rule underlyingCannotChange(method f, env e, calldataarg args) filtered {
+    f -> !untestedFunctions(f)
+}{
+    address originalAsset = asset();
+
+    f(e, args);
+
+    address newAsset = asset();
+
+    assert originalAsset != newAsset => f.selector == initialize(address,string,string).selector ,
+        "Underlying asset cannot change except in initialize function";
+}
+
+rule assetsMustNotRevert(env e) {
+  asset@withrevert();
+
+  assert !lastReverted, "asset() must not revert";
+}
+
+rule maxDepositRule(env e) {
+  address receiver;
+
+  uint256 max = maxDeposit(receiver);
+  uint256 amount;
+
+  deposit@withrevert(e, amount, receiver);
+
+  assert amount > max => lastReverted,
+        "must revert if deposit more than maxDeposit";
+}
+
+// ERC4626
+
+// Call rayDivRoundDown (assets * RAY) / b;  with RAY = 1e27
+// So reverts with assets > 2^256 / 1e27  around  1e51
+
+rule totalAssetsMustNotRevert1(env e) {
+  uint256 assets;
+
+  require rate(e) > 0;
+
+  convertToShares@withrevert(e, assets);
+
+  assert lastReverted => assets > 10^50,
+    "ERC4626 : convertToShares() must not revert unless due to integer overflow caused by an unreasonably large input";
+}
+
+rule totalAssetsMustNotRevert2(env e) {
+  uint256 assets = 10^52;
+
+  require rate(e) == 1;
+
+  convertToShares@withrevert(e, assets);
+
+  assert lastReverted, "ERC4626 : convertToShares() should reverts with integer overflow caused by an unreasonably large input";
+}

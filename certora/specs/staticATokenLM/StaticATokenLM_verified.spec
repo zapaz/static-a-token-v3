@@ -14,7 +14,7 @@ invariant totalSupplyInvariant()
     filtered { f -> !untestedFunctions(f)}
 
 
-// unclaimed rewards always less than claimable rewards
+// Unclaimed rewards always less than Claimable rewards
 rule unclaimedLessThanClaimableRule(env e) {
     address user;
 
@@ -24,7 +24,7 @@ rule unclaimedLessThanClaimableRule(env e) {
     assert _unclaimed <= _claimable;
 }
 
-// unclaimed rewards unchanged by any function expect filtered
+// Unclaimed rewards unchanged by any function expect filtered
 rule unclaimedUnchangedRule(method f, env e, calldataarg args) filtered {
     f -> !depositFunctions(f) && !withdrawFunctions(f)
       && !claimFunctions(f)   && !transferFunctions(f)
@@ -39,6 +39,7 @@ rule unclaimedUnchangedRule(method f, env e, calldataarg args) filtered {
     assert unclaimed_ == _unclaimed;
 }
 
+// Claimable rewards unchanged by any function expect filtered
 rule claimableUnchangedRule(method f, env e, calldataarg args) filtered {
     f -> !depositFunctions(f) && !withdrawFunctions(f)
       && !claimFunctions(f)   && !transferFunctions(f)
@@ -68,3 +69,112 @@ rule totalAssetsUnchangedRule(method f) filtered {
 
     assert totalAssets_ == _totalAssets;
 }
+
+// Initialize function cannot be called twice
+rule initializeCannotBeCalledTwice(env e, calldataarg args) {
+    initialize(e, args);
+    initialize@withrevert(e, args);
+
+    assert lastReverted, "Initialize cannot be called twice";
+}
+
+// Claimable rewards decrease on transfer
+rule claimableRewardsDecreaseOnTransfer(env e, calldataarg args) {
+  address from = e.msg.sender;
+  address to;
+  uint256 amount;
+
+  mathint _claimableRewards = getClaimableRewards(e, from, _DummyERC20_rewardToken);
+  mathint _balanceStataTokenFrom = balanceOf(from);
+  mathint _balanceStataTokenTo = balanceOf(to);
+
+
+  require(to != from);
+  transfer(e, to, amount);
+
+  mathint claimableRewards_ = getClaimableRewards(e, from, _DummyERC20_rewardToken);
+  mathint balanceStataTokenFrom_ = balanceOf(from);
+  mathint balanceStataTokenTo_ = balanceOf(to);
+
+  assert claimableRewards_ <= _claimableRewards;
+
+  assert _balanceStataTokenFrom + _balanceStataTokenTo
+    ==   balanceStataTokenFrom_ + balanceStataTokenTo_;
+
+  assert balanceStataTokenFrom_ + amount == _balanceStataTokenFrom;
+}
+
+
+
+// deposit more aToken gives more stataToken
+rule depositMoreRule(env e) {
+    storage initial = lastStorage;
+
+    address user;
+    uint256 aTokenAmount1;
+    uint256 aTokenAmount2;
+    mathint stataTokenBal = balanceOf(user);
+    require stataTokenBal == 0;
+
+    deposit(e, aTokenAmount1, user) at initial;
+    mathint stataTokenBal1 = balanceOf(user);
+
+    deposit(e, aTokenAmount2, user) at initial;
+    mathint stataTokenBal2 = balanceOf(user);
+
+    assert aTokenAmount1 <= aTokenAmount2 => stataTokenBal1 <= stataTokenBal2;
+}
+
+// claimed rewards are at most claimable rewards
+rule claimRewardsRule_10(env e) {
+    address user = e.msg.sender;
+    require user != 0;
+
+    // setupUser(e, user);
+    // single_RewardToken_setup();
+
+    mathint _unclaimed = getUnclaimedRewards(user, _DummyERC20_rewardToken);
+    mathint _claimable = getClaimableRewards(e, user, _DummyERC20_rewardToken);
+    mathint _balUser   = _DummyERC20_rewardToken.balanceOf(user);
+    mathint _balContract = _DummyERC20_rewardToken.balanceOf(currentContract);
+
+    uint256 ether = 1000000000000000000;
+    require _unclaimed   >= 1 * ether;
+    require _claimable   >= 1 * ether;
+    require _balUser     <= 1 * ether;
+    require _balContract >= 1000 * ether;
+    require _balContract <= 1000000000 * ether;
+
+    address[] rewards;
+    require rewards[0] == _DummyERC20_rewardToken;
+    require rewards.length == 1;
+
+
+    claimRewards@withrevert(e, user, rewards);
+
+    mathint unclaimed_ = getUnclaimedRewards(user, _DummyERC20_rewardToken);
+    mathint claimable_ = getClaimableRewards(e, user, _DummyERC20_rewardToken);
+    mathint balUser_   = _DummyERC20_rewardToken.balanceOf(user);
+    mathint balContract_ = _DummyERC20_rewardToken.balanceOf(currentContract);
+
+    assert balUser_ >= _balUser;
+    assert balUser_ <= _balUser + _claimable;
+
+    assert balContract_ <= _balContract;
+}
+
+rule redeemLessThanMaxRedeem(env e, calldataarg args) {
+    address owner;
+    address receiver;
+    bool toUnderlying = true;
+
+    uint256 _maxRedeem = maxRedeem(owner);
+
+    uint256 redeem_;
+    uint256 aToken_;
+    redeem_, aToken_ = redeem(e, _maxRedeem, receiver, owner, toUnderlying);
+
+    assert  redeem_ <= _maxRedeem;
+}
+
+

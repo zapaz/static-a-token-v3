@@ -17,6 +17,7 @@ methods
         asset() returns (address) envfree
         totalAssets() returns (uint256)
         maxWithdraw(address owner) returns (uint256)
+        redeem(uint256,address,address,bool)  returns (uint256,uint256)
         maxRedeem(address owner) returns (uint256) envfree
         previewWithdraw(uint256) returns (uint256)
         previewRedeem(uint256) returns (uint256)

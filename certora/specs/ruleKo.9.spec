@@ -1,3 +1,6 @@
+import "methods/methods_base.spec"
+import "staticATokenLM/StaticATokenLM_base.spec"
+
 
 rule depositMonotonicity() {
     env e; storage start = lastStorage;
@@ -6,7 +9,7 @@ rule depositMonotonicity() {
     address receiver;
     require currentContract != e.msg.sender && currentContract != receiver;
 
-    safeAssumptions(e, e.msg.sender, receiver);
+    // safeAssumptions(e, e.msg.sender, receiver);
 
     deposit(e, smallerAssets, receiver);
     uint256 smallerShares = balanceOf(receiver) ;
@@ -19,13 +22,32 @@ rule depositMonotonicity() {
 }
 
 
+// A helper function to set the receiver
+function callReceiverFunctions(method f, env e, address receiver) {
+    uint256 amount;
+    if (f.selector == deposit(uint256,address).selector) {
+        deposit(e, amount, receiver);
+    } else if (f.selector == mint(uint256,address).selector) {
+        mint(e, amount, receiver);
+    } else if (f.selector == withdraw(uint256,address,address).selector) {
+        address owner;
+        withdraw(e, amount, receiver, owner);
+    } else if (f.selector == redeem(uint256,address,address).selector) {
+        address owner;
+        redeem(e, amount, receiver, owner);
+    } else {
+        calldataarg args;
+        f(e, args);
+    }
+}
+
 rule totalsMonotonicity() {
     method f; env e; calldataarg args;
     require e.msg.sender != currentContract;
     uint256 totalSupplyBefore = totalSupply();
     uint256 totalAssetsBefore = totalAssets(e);
     address receiver;
-    safeAssumptions(e, receiver, e.msg.sender);
+    // safeAssumptions(e, receiver, e.msg.sender);
     callReceiverFunctions(f, e, receiver);
 
     uint256 totalSupplyAfter = totalSupply();

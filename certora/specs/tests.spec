@@ -1,14 +1,19 @@
 import "methods/methods_base.spec"
+import "staticATokenLM/StaticATokenLM_base.spec"
 
-rule underlyingCannotChange(method f, env e, calldataarg args) filtered {
-    f -> !untestedFunctions(f)
-}{
-    address originalAsset = asset();
 
-    f(e, args);
+// Claimable rewards decrease on transfer
+rule claimableRewardsDecreaseOnTransferA(env e) {
+  address to;
+  uint256 amount;
 
-    address newAsset = asset();
+  require rate(e) == 1 || rate(e) == 2 ;
 
-    assert originalAsset == newAsset,
-        "the underlying asset of a contract must not change";
+  mathint _claimableRewards = getClaimableRewards(e, e.msg.sender, _DummyERC20_rewardToken);
+
+  transfer(e, to, amount);
+
+  mathint claimableRewards_ = getClaimableRewards(e, e.msg.sender, _DummyERC20_rewardToken);
+
+  assert claimableRewards_ <= _claimableRewards;
 }
