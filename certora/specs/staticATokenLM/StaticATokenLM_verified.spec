@@ -24,7 +24,7 @@ rule unclaimedLessThanClaimableRule(env e) {
     assert _unclaimed <= _claimable;
 }
 
-// Unclaimed rewards unchanged by any function expect filtered
+// Unclaimed rewards unchanged by any function expect those changing share balance and claims
 rule unclaimedUnchangedRule(method f, env e, calldataarg args) filtered {
     f -> !depositFunctions(f) && !withdrawFunctions(f)
       && !claimFunctions(f)   && !transferFunctions(f)
@@ -39,7 +39,7 @@ rule unclaimedUnchangedRule(method f, env e, calldataarg args) filtered {
     assert unclaimed_ == _unclaimed;
 }
 
-// Claimable rewards unchanged by any function expect filtered
+// Claimable rewards unchanged by any function expect those changing share balance and claims
 rule claimableUnchangedRule(method f, env e, calldataarg args) filtered {
     f -> !depositFunctions(f) && !withdrawFunctions(f)
       && !claimFunctions(f)   && !transferFunctions(f)
@@ -104,8 +104,6 @@ rule claimableRewardsDecreaseOnTransfer(env e, calldataarg args) {
   assert balanceStataTokenFrom_ + amount == _balanceStataTokenFrom;
 }
 
-
-
 // deposit more aToken gives more stataToken
 rule depositMoreRule(env e) {
     storage initial = lastStorage;
@@ -163,6 +161,7 @@ rule claimRewardsRule_10(env e) {
     assert balContract_ <= _balContract;
 }
 
+// redeem Token must be less than maxRedeem
 rule redeemLessThanMaxRedeem(env e, calldataarg args) {
     address owner;
     address receiver;
@@ -176,5 +175,3 @@ rule redeemLessThanMaxRedeem(env e, calldataarg args) {
 
     assert  redeem_ <= _maxRedeem;
 }
-
-
