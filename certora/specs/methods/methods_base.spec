@@ -4,9 +4,9 @@ using StaticATokenLMHarness as _StaticATokenLM
 using SymbolicLendingPool as _SymbolicLendingPool
 using RewardsControllerHarness as _RewardsController
 using TransferStrategyHarness as _TransferStrategy
-using DummyERC20_aTokenUnderlying as _DummyERC20_aTokenUnderlying 
+using DummyERC20_aTokenUnderlying as _DummyERC20_aTokenUnderlying
 using AToken as _AToken
-using DummyERC20_rewardToken as _DummyERC20_rewardToken 
+using DummyERC20_rewardToken as _DummyERC20_rewardToken
 
 /////////////////// Methods ////////////////////////
 
@@ -17,6 +17,7 @@ methods
         asset() returns (address) envfree
         totalAssets() returns (uint256)
         maxWithdraw(address owner) returns (uint256)
+        redeem(uint256,address,address,bool)  returns (uint256,uint256)
         maxRedeem(address owner) returns (uint256) envfree
         previewWithdraw(uint256) returns (uint256)
         previewRedeem(uint256) returns (uint256)
@@ -27,12 +28,12 @@ methods
         getUnclaimedRewards(address, address) returns (uint256) envfree
         rewardTokens() returns (address[]) envfree
         isRegisteredRewardToken(address) returns (bool) envfree
-        
+
     // static aToken harness
     // ---------------------
         getStaticATokenUnderlying() returns (address) envfree
         getRewardsIndexOnLastInteraction(address, address) returns (uint128) envfree
-        getRewardTokensLength() returns (uint256) envfree 
+        getRewardTokensLength() returns (uint256) envfree
         getRewardToken(uint256) returns (address) envfree
         getReserveData_AToken() returns (address) envfree
 
@@ -44,15 +45,15 @@ methods
     // ----
         _SymbolicLendingPool.getReserveNormalizedIncome(address) returns (uint256)
         getReserveData(address) returns ((uint256),uint128,uint128,uint128,uint128,uint128,uint40,uint16,address,address,address,address,uint128,uint128,uint128) envfree => CONSTANT
-	
+
     // rewards controller
 	// ------------------
         // In RewardsDistributor.sol called by RewardsController.sol
         getAssetIndex(address, address) returns (uint256, uint256) => DISPATCHER(true)
         // In ScaledBalanceTokenBase.sol called by getAssetIndex
-        scaledTotalSupply() returns (uint256)  => DISPATCHER(true) 
+        scaledTotalSupply() returns (uint256)  => DISPATCHER(true)
         // Called by RewardsController._transferRewards()
-        // Defined in TransferStrategyHarness as simple transfer() 
+        // Defined in TransferStrategyHarness as simple transfer()
         performTransfer(address,address,uint256) returns (bool) =>  DISPATCHER(true)
 
         // harness methods of the rewards controller
@@ -80,9 +81,9 @@ methods
         _AToken.UNDERLYING_ASSET_ADDRESS() returns (address) envfree
         _AToken.scaledBalanceOf(address) returns (uint256) envfree
         _AToken.scaledTotalSupply() returns (uint256) envfree
-        
+
         // called in aToken
-        finalizeTransfer(address, address, address, uint256, uint256, uint256) => NONDET  
+        finalizeTransfer(address, address, address, uint256, uint256, uint256) => NONDET
         // Called by rewardscontroller.sol
         // Defined in scaledbalancetokenbase.sol
         getScaledUserBalanceAndSupply(address) returns (uint256, uint256) => DISPATCHER(true)
@@ -106,26 +107,52 @@ methods
 
     definition RAY() returns uint256 = 10^27;
 
-    /// @notice Claim rewards methods
-    definition claimFunctions(method f) returns bool = 
-        (f.selector == claimRewardsToSelf(address[]).selector ||
-        f.selector == claimRewards(address, address[]).selector ||
-        f.selector == claimRewardsOnBehalf(address, address,address[]).selector);
-                
+    definition claimFunctions(method f) returns bool =
+        (   f.selector == claimRewards(address, address[]).selector
+        ||  f.selector == claimRewardsToSelf(address[]).selector
+        ||  f.selector == claimRewardsOnBehalf(address, address,address[]).selector );
+
+    definition metaDepositFunction(method f) returns bool =
+            f.selector == metaDeposit(address,address,uint256,uint16,bool,uint256,(address,address,uint256,uint256,uint8,bytes32,bytes32),(uint8,bytes32,bytes32)).selector;
+
+    definition depositFunctions(method f) returns bool =
+        (   f.selector == deposit(uint256,address).selector
+        ||  f.selector == deposit(uint256,address,uint16,bool).selector
+        ||  f.selector == mint(uint256,address).selector );
+
+    definition withdrawFunctions(method f) returns bool =
+        (   f.selector == redeem(uint256,address,address).selector
+        ||  f.selector == redeem(uint256,address,address,bool).selector
+        ||  f.selector == withdraw(uint256,address,address).selector
+        ||  f.selector == metaWithdraw(address,address,uint256,uint256,bool,uint256,(uint8,bytes32,bytes32)).selector );
+
+    definition transferFunctions(method f) returns bool =
+        (   f.selector == transfer(address,uint256).selector
+        ||  f.selector == transferFrom(address,address,uint256).selector );
+
+    definition assetsFunctions(method f) returns bool =
+        (   depositFunctions(f) || claimFunctions(f) || withdrawFunctions(f) );
+
     definition collectAndUpdateFunction(method f) returns bool =
         f.selector == collectAndUpdateRewards(address).selector;
 
-    definition harnessOnlyMethods(method f) returns bool =
-        (harnessMethodsMinusHarnessClaimMethods(f) ||
-        f.selector == claimSingleRewardOnBehalf(address, address, address).selector ||
-        f.selector == claimDoubleRewardOnBehalfSame(address, address, address).selector);
-        
-    definition harnessMethodsMinusHarnessClaimMethods(method f) returns bool =
-        (f.selector == getStaticATokenUnderlying().selector ||
-        f.selector == getRewardTokensLength().selector ||
-        f.selector == getRewardToken(uint256).selector ||
-        f.selector == getRewardsIndexOnLastInteraction(address, address).selector ||
-        f.selector == getLastUpdatedIndex(address).selector);
+    definition untestedFunctions(method f) returns bool =
+        harnessFunctions(f) || metaDepositFunction(f);
+
+    definition harnessFunctions(method f) returns bool =
+        harnessClaimFunctions(f) || harnessMethodsMinusHarnessClaimFunctions(f);
+
+    definition harnessClaimFunctions(method f) returns bool =
+        (   f.selector == claimSingleRewardOnBehalf(address, address, address).selector
+        ||  f.selector == claimDoubleRewardOnBehalfSame(address, address, address).selector);
+
+    definition harnessMethodsMinusHarnessClaimFunctions(method f) returns bool =
+        (   f.selector == getStaticATokenUnderlying().selector
+        ||  f.selector == getRewardTokensLength().selector
+        ||  f.selector == getRewardToken(uint256).selector
+        ||  f.selector == getRewardsIndexOnLastInteraction(address, address).selector
+        ||  f.selector == getLastUpdatedIndex(address).selector
+        ||  f.selector == getReserveData_AToken().selector );
 
 ////////////////// FUNCTIONS //////////////////////
 
@@ -151,14 +178,10 @@ methods
 
     /// @title Assumptions that should hold in any run
     /// @dev Assume that RewardsController.configureAssets(RewardsDataTypes.RewardsConfigInput[] memory rewardsInput) was called
-    function setup(env e, address user)
+    function setupUser(env e, address user)
     {
-        require getRewardTokensLength() > 0;
-        require _RewardsController.getAvailableRewardsCount(_AToken)  > 0;
-        require _RewardsController.getRewardsByAsset(_AToken, 0) == _DummyERC20_rewardToken;
-        require currentContract != e.msg.sender;
+        setup(e);
         require currentContract != user;
-    
         require _AToken != user;
         require _RewardsController !=  user;
         require _DummyERC20_aTokenUnderlying  != user;
@@ -166,5 +189,11 @@ methods
         require _SymbolicLendingPool != user;
         require _TransferStrategy != user;
         require _TransferStrategy != user;
+    }
+    function setup(env e)
+    {
+        rewardsController_reward_setup();
+        require getRewardTokensLength() > 0;
         require getReserveData_AToken() == _AToken;
+        require currentContract != e.msg.sender;
     }

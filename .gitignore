@@ -3,7 +3,12 @@ cache/
 out/
 
 # general
-.env
+.env*
+
+# certora
+.certora*
+.zip*
+*.zip
 
 # editors
 .idea
@@ -14,3 +19,5 @@ package-lock.json
 node_modules
 
 broadcast
+
+
